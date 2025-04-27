@@ -1,22 +1,28 @@
--- Admin GUI Script
-
+-- Services
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
-local PlayerGui = player:WaitForChild("PlayerGui")
+local playerGui = player:WaitForChild("PlayerGui")
 
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Parent = PlayerGui
+-- Folder for GUI
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "CommandGui"
+screenGui.Parent = playerGui
 
-local Frame = Instance.new("Frame")
-Frame.Size = UDim2.new(0, 300, 0, 400)
-Frame.Position = UDim2.new(0, 100, 0, 100)
-Frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-Frame.Parent = ScreenGui
+-- Scrolling frame
+local scrollingFrame = Instance.new("ScrollingFrame")
+scrollingFrame.Parent = screenGui
+scrollingFrame.Size = UDim2.new(0, 300, 0, 400)
+scrollingFrame.Position = UDim2.new(0, 20, 0, 20)
+scrollingFrame.CanvasSize = UDim2.new(0, 0, 5, 0)
+scrollingFrame.ScrollBarThickness = 10
+scrollingFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 
-local UIListLayout = Instance.new("UIListLayout")
-UIListLayout.Parent = Frame
+-- UI layout
+local layout = Instance.new("UIListLayout")
+layout.Parent = scrollingFrame
+layout.Padding = UDim.new(0, 5)
 
--- Your commands
+-- Command list
 local cmds = {
     ["!afk"] = "https://raw.githubusercontent.com/2dgeneralspam1/scripts-and-stuff/master/scripts/LoadstringypVvhJBq4QNz",
     ["!aimbot"] = "https://raw.githubusercontent.com/OBaqt1nbJz1NipM92jv/6qQE2IF1FGovyLEEepBn/main/aimbot",
@@ -136,17 +142,27 @@ local cmds = {
     ["!walkonwalls"] = "https://raw.githubusercontent.com/sinret/rbxscript.com-scripts-reuploads-/main/WalkOnWalls"
 }
 
--- Create buttons
+-- Create a button for each command
 for name, url in pairs(cmds) do
-    local Button = Instance.new("TextButton")
-    Button.Size = UDim2.new(1, 0, 0, 40)
-    Button.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    Button.TextColor3 = Color3.new(1,1,1)
-    Button.Text = name
-    Button.Parent = Frame
-    
-    Button.MouseButton1Click:Connect(function()
-        -- Fetch and execute the script
-        loadstring(game:HttpGet(url))()
+    local button = Instance.new("TextButton")
+    button.Parent = scrollingFrame
+    button.Size = UDim2.new(1, -10, 0, 40)
+    button.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    button.Font = Enum.Font.SourceSansBold
+    button.Text = name
+    button.TextSize = 18
+
+    button.MouseButton1Click:Connect(function()
+        -- Safe loadstring
+        local success, err = pcall(function()
+            loadstring(game:HttpGet(url))()
+        end)
+
+        if success then
+            print(name .. " loaded successfully!")
+        else
+            warn("Failed to load " .. name .. ": " .. err)
+        end
     end)
 end
